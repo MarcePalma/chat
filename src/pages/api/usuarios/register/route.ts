@@ -34,7 +34,7 @@ export default async function POST(req: Request) {
         return new Response(
             JSON.stringify({ msg: "No se pudo subir el usuario!" }),
             { status: 500 }
-        );
+        );  
 
     const token = sign(usuarioAGuardar, process.env.TOKEN_SECRET as string);
 
