@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import io from "socket.io-client";
 
 let socket;
+
 const urlRegex =
     /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
 
@@ -15,21 +16,26 @@ export default function ChatPage() {
         iniciarSockets();
 
         return () => {
-            socket.disconnect();
+            if (socket) {
+                socket.disconnect();
+            }
         };
     }, []);
 
     async function iniciarSockets() {
-        await fetch("/api/socket");
+        try {
+            await fetch("/api/socket");
+            socket = io();
 
-        socket = io();
-
-        socket.on("chat:mensaje", (mensajeNuevo) => {
-            setTodosLosMensajes((mensajesAnteriores) => [
-                ...mensajesAnteriores,
-                mensajeNuevo,
-            ]);
-        });
+            socket.on("chat:mensaje", (mensajeNuevo) => {
+                setTodosLosMensajes((mensajesAnteriores) => [
+                    ...mensajesAnteriores,
+                    mensajeNuevo,
+                ]);
+            });
+        } catch (error) {
+            console.error("Error al iniciar sockets:", error);
+        }
     }
 
     function manejarEnvioDeMensaje(evento) {
@@ -37,7 +43,9 @@ export default function ChatPage() {
 
         console.log("Mensaje enviado!");
 
-        socket.emit("chat:mensaje", { username, contenido: message });
+        if (socket) {
+            socket.emit("chat:mensaje", { username, contenido: message });
+        }
 
         setMessage("");
     }
