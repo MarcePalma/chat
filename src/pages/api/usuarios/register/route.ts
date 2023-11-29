@@ -5,7 +5,7 @@ import { sign } from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export default async function POST(req: Request) {
     const usuario = await req.json();
 
     if (Object.values(usuario).includes(undefined)) {
