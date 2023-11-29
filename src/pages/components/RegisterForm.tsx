@@ -1,10 +1,9 @@
 "use client";
 import { FormEvent, useRef } from "react";
+import { verify } from "jsonwebtoken";
 import { useContext } from "react";
 import { UserContext } from "@/Context/userContex";
 import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/router";
 
 export default function FormularioDeRegistro() {
     const nombreRef = useRef(null);
@@ -50,8 +49,6 @@ export default function FormularioDeRegistro() {
         const { token } = await respuesta.json();
 
         setUser({ ...datosAEnviar, token });
-        const router = useRouter();
-        router.push('/chat');
 
         //@ts-ignore
         if (recordarmeRef.current?.value) {
@@ -59,6 +56,13 @@ export default function FormularioDeRegistro() {
         }
 
         console.log(user);
+
+        // const usuarioDecodificado = verify(
+        //   token as string,
+        //   process.env.NEXT_PUBLIC_TOKEN_SECRET as string
+        // );
+
+        // console.log(usuarioDecodificado);
     }
 
     return (
@@ -83,6 +87,7 @@ export default function FormularioDeRegistro() {
         </>
     );
 }
+
 
 
 
