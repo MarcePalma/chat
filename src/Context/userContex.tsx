@@ -5,7 +5,7 @@ export const UserContext = createContext({} as any);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState({
-    nombre: "",
+    name: "",
     edad: 0,
     email: "",
     password: "",

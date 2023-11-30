@@ -1,13 +1,23 @@
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import { useContext, useEffect } from "react";
+import { UserContext } from "@/Context/userContex";
+import { useRouter } from "next/router";
 
 export default function Home() {
-  return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-    
-    </main>
-  )
+  const { user } = useContext(UserContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Verifica si el usuario está autenticado (puede ajustarse según tu lógica)
+    if (!user || !user.token) {
+      // Si no está autenticado, redirige a la página de registro
+      router.push("/auth/registrarse");
+    } else {
+      // Si está autenticado, redirige a la página de chat
+      router.push("/chat");
+    }
+  }, [user, router]);
+
+  // No necesitas renderizar nada en la página de inicio, ya que la redirección ocurrirá antes
+
+  return null;
 }
