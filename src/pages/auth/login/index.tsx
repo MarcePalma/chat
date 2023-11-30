@@ -3,7 +3,7 @@ import FormularioDeLogin from '@/pages/components/LoginForm'
 
 export default function Page() {
   return (
-    <section>
+    <section className='dark:bg-gray-900'>
       <FormularioDeLogin />
     </section>
   )

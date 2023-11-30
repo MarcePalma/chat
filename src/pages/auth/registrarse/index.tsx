@@ -3,7 +3,7 @@ import FormularioDeRegistro from '@/pages/components/RegisterForm'
 
 export default function Page() {
     return (
-        <section>
+        <section className='dark:bg-gray-900'>
             <FormularioDeRegistro></FormularioDeRegistro>
         </section>
     )
