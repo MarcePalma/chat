@@ -2,45 +2,43 @@ import { emailRegex, passwordRegex } from "@/utils/regex";
 import { PrismaClient } from "@prisma/client";
 import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { NextApiRequest, NextApiResponse } from 'next';
 
+const prisma = new PrismaClient();
 
-const prisma = new PrismaClient()
+export async function POST(req: Request) {
+    const usuario = await req.json();
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
+    if (!usuario.email.match(emailRegex))
+        return new Response(JSON.stringify({ error: "Email inválido" }), { status: 400 });
+
+    if (!usuario.password.match(passwordRegex))
+        return new Response(JSON.stringify({ error: "Contraseña inválida" }), { status: 400 });
+
+    const usuarioEnDB = await prisma.usuario.findUnique({
+        where: {
+            email: usuario.email,
+        },
+    });
+
+    if (!usuarioEnDB)
+        return new Response(JSON.stringify({ error: "Cuenta no existe" }), { status: 403 });
+
+    const contrasenaValida = await compare(
+        usuario.password,
+        usuarioEnDB.password
+    );
+
+    if (!contrasenaValida)
+        return new Response(JSON.stringify({ error: "Contraseña inválida" }), { status: 401 });
+
     try {
-        const usuario = req.body;
-
-        if (!usuario.email.match(emailRegex))
-            return new Response("Email Invalido!", { status: 400 });
-
-        if (!usuario.password.match(passwordRegex))
-            return new Response("Contrasena invalida!", { status: 400 });
-
-        const usuarioenDB = await prisma.usuario.findUnique({
-            where: {
-                email: usuario.email,
-            }
+        const token = sign(usuarioEnDB, process.env.TOKEN_SECRET as string, {
+            expiresIn: "7d",
         });
 
-        if (!usuarioenDB) return res.status(404).json({ msg: "Cuenta no existe!" });
-
-
-        const contrasenaValida = await compare(
-            usuario.password,
-            usuarioenDB.password
-        )
-
-        if (!contrasenaValida) return res.status(401).json({ msg: "Contrasena no valida!" });
-
-        const token = sign(usuarioenDB, process.env.TOKEN_SECRET as string, {
-            expiresIn: "30d"
-        })
-
-        return res.status(201).json({ token });
-
+        return new Response(JSON.stringify({ token, nombre: usuarioEnDB.name }), { status: 200 });
     } catch (error) {
-        console.error("Error al Logear usuario:", error);
-        return res.status(500).json({ msg: "Error interno del servidor" });
+        console.error("Error al firmar el token:", error);
+        return new Response(JSON.stringify({ error: "Error interno del servidor" }), { status: 500 });
     }
 }
