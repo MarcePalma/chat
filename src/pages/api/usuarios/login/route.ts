@@ -33,11 +33,30 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
         return res.status(401).json({ error: "Contraseña inválida" });
 
     try {
+        const { id, name, email, edad } = usuarioEnDB;
         const token = sign(usuarioEnDB, process.env.TOKEN_SECRET as string, {
             expiresIn: "7d",
         });
 
-        return res.status(200).json({ token, name: usuarioEnDB.name });
+        await prisma.usuario.update({
+            where: { id: usuarioEnDB.id },
+            data: { connected: true },
+        });
+
+        const mensajesDelChat = await prisma.mensaje.findMany({
+            where: {
+                OR: [
+                    { enviadoPorId: usuarioEnDB.id },
+                    { enviadoAId: usuarioEnDB.id },
+                ],
+            },
+            orderBy: {
+                creadoEn: 'asc',
+            },
+        });
+
+        return res.status(200).json({ token, user: { id, name, email, edad }, mensajesDelChat });
+
     } catch (error) {
         console.error("Error al firmar el token:", error);
         return res.status(500).json({ error: "Error interno del servidor" });

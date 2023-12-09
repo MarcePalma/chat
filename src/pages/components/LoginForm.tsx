@@ -39,11 +39,12 @@ export default function FormularioDeLogin() {
             return;
         }
 
-        const { token, nombre } = await respuesta.json();
+        const { token, nombre, mensajesDelChat } = await respuesta.json();
 
-        localStorage.setItem("usuario", JSON.stringify({ token, nombre }));
-        setUser({ token, nombre });
+        // Guardar el token y otros datos en el contexto del usuario
+        setUser({ token, nombre, mensajesDelChat });
 
+        // Redirigir a la página principal
         router.push("/");
     }
 

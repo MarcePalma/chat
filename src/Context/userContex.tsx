@@ -10,6 +10,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     email: "",
     password: "",
     edad: 0,
+    connected: false,
+    socketId: "",
   });
 
   return (

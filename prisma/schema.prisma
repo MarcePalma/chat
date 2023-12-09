@@ -16,4 +16,17 @@ model Usuario {
   email String @unique
   password String
   edad Int
+  connected Boolean @default(false)
+  mensajesEnviados Mensaje[] @relation("EnviadoPor")
+  mensajesRecibidos Mensaje[] @relation("EnviadoA")
+}
+
+model Mensaje {
+  id String @id @default(uuid())
+  contenido String
+  enviadoPor Usuario @relation(fields: [enviadoPorId], references: [id], name: "EnviadoPor")
+  enviadoPorId String
+  enviadoA Usuario @relation(fields: [enviadoAId], references: [id], name: "EnviadoA")
+  enviadoAId String
+  creadoEn DateTime @default(now())
 }
