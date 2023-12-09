@@ -2,17 +2,18 @@ import { emailRegex, passwordRegex } from "@/utils/regex";
 import { PrismaClient } from "@prisma/client";
 import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
-    const usuario = await req.json();
+export default async function POST(req: NextApiRequest, res: NextApiResponse) {
+    const usuario = req.body;
 
     if (!usuario.email.match(emailRegex))
-        return new Response(JSON.stringify({ error: "Email inválido" }), { status: 400 });
+        return res.status(400).json({ error: "Email inválido" });
 
     if (!usuario.password.match(passwordRegex))
-        return new Response(JSON.stringify({ error: "Contraseña inválida" }), { status: 400 });
+        return res.status(400).json({ error: "Contraseña inválida" });
 
     const usuarioEnDB = await prisma.usuario.findUnique({
         where: {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
     });
 
     if (!usuarioEnDB)
-        return new Response(JSON.stringify({ error: "Cuenta no existe" }), { status: 403 });
+        return res.status(403).json({ error: "Cuenta no existe" });
 
     const contrasenaValida = await compare(
         usuario.password,
@@ -29,16 +30,16 @@ export async function POST(req: Request) {
     );
 
     if (!contrasenaValida)
-        return new Response(JSON.stringify({ error: "Contraseña inválida" }), { status: 401 });
+        return res.status(401).json({ error: "Contraseña inválida" });
 
     try {
         const token = sign(usuarioEnDB, process.env.TOKEN_SECRET as string, {
             expiresIn: "7d",
         });
 
-        return new Response(JSON.stringify({ token, nombre: usuarioEnDB.name }), { status: 200 });
+        return res.status(200).json({ token, name: usuarioEnDB.name });
     } catch (error) {
         console.error("Error al firmar el token:", error);
-        return new Response(JSON.stringify({ error: "Error interno del servidor" }), { status: 500 });
+        return res.status(500).json({ error: "Error interno del servidor" });
     }
 }

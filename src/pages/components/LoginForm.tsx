@@ -25,7 +25,7 @@ export default function FormularioDeLogin() {
 
         console.log(datosAEnviar);
 
-        const respuesta = await fetch("http://localhost:3000/api/usuarios/register/route", {
+        const respuesta = await fetch("http://localhost:3000/api/usuarios/login/route", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default function FormularioDeLogin() {
             <article className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <Link href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                     <Image width={700} height={700} className="w-8 h-8 mr-2" src="/images/Logo.webp" alt="logo" />
-                    Seeyy Blog
+                    Seeyy Chat
                 </Link>
                 <section className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-900 dark:border-gray-700">
                     <section className="p-6 space-y-4 md:space-y-6 sm:p-8">

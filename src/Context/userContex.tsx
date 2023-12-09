@@ -1,4 +1,5 @@
-"use client";
+"use client"
+import React from "react";
 import { createContext, useState } from "react";
 
 export const UserContext = createContext({} as any);
@@ -6,9 +7,9 @@ export const UserContext = createContext({} as any);
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState({
     name: "",
-    edad: 0,
     email: "",
     password: "",
+    edad: 0,
   });
 
   return (
